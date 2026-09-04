@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import noteService from './services/notes'
 
 const Filter = ({personsToShow, handleFilterChange}) => {
   return (
@@ -31,9 +32,9 @@ const Persons = ({ persons, personsToShow }) => {
 const App = () => {
   const [persons, setPersons] = useState([])
   const hook = () => {
-    axios.get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    noteService.getAll()
+      .then(data => {
+        setPersons(data)
       })
   }
   useEffect(hook, [])
