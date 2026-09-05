@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import noteService from './services/notes'
+import Notification from './components/Notification'
 
 const Filter = ({ personsToShow, handleFilterChange }) => {
   return (
@@ -51,6 +52,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNum, setNewNum] = useState('')
   const [personsToShow, setPersonsToShow] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -71,6 +73,11 @@ const App = () => {
         const personObject = { ...persons.find(p => p.name === newName), number: newNum }
         noteService.update(personObject.id, personObject).then(returnedObj => {
           setPersons(persons.map(p => p.id !== personObject.id ? p : returnedObj))
+        }).then(() => {
+          setSuccessMessage(`Updated ${newName}`)
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
         })
       }
       return
@@ -84,6 +91,11 @@ const App = () => {
 
     noteService.create(personObject).then(returnedObj => {
       setPersons(persons.concat(returnedObj))
+    }).then(() => {
+      setSuccessMessage(`Added ${newName}`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
     })
 
     setNewName('')
@@ -93,6 +105,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage} />
       <Filter personsToShow={personsToShow} handleFilterChange={handleFilterChange} />
 
       <h3>Add a new</h3>
