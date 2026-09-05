@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import noteService from './services/notes'
 
 const Filter = ({personsToShow, handleFilterChange}) => {
@@ -31,13 +30,13 @@ const Persons = ({ persons, personsToShow }) => {
 
 const App = () => {
   const [persons, setPersons] = useState([])
-  const hook = () => {
+  const loadPersonsHook = () => {
     noteService.getAll()
       .then(data => {
         setPersons(data)
       })
   }
-  useEffect(hook, [])
+  useEffect(loadPersonsHook, [])
 
   const [newName, setNewName] = useState('')
   const [newNum, setNewNum] = useState('')
@@ -67,7 +66,10 @@ const App = () => {
       number: newNum,
       id: persons.length + 1
     }
-    setPersons(persons.concat(personObject))
+    
+    noteService.create(personObject).then(returnedObj => {
+      setPersons(persons.concat(returnedObj))
+    })
 
     setNewName('')
     setNewNum('')
