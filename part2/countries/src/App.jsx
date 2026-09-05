@@ -14,11 +14,14 @@ const App = () => {
             .toLowerCase()
             .includes(newQuery.toLowerCase()))
     const n_results = queriedData.length
-    console.log(`nresults ${n_results}`);
+    // console.log(`nresults ${n_results}`)
     const overTenContent = () => [["Too many matches. Specify another filter."], false]
-    const twoToTenContent = () => [queriedData.map(country => country.name.common), false]
+    const twoToTenContent = () => [queriedData.map(
+      country => {
+        return <>{country.name.common} <button onClick={() => {setNewQuery(country.name.common)}}>Show</button></>
+      }
+    ), false]
     const oneContent = () => {
-        console.log(`queried: ${queriedData}`)
         return [queriedData, true]
     }
     const [content, findsOneResult] = n_results > 10 ? overTenContent()
@@ -34,7 +37,7 @@ const App = () => {
     // Fetch
     useEffect(() => {
         axios
-            .get('https://restcountries.com/v3.1/all')
+            .get('https://studies.cs.helsinki.fi/restcountries/api/all')
             .then(resp => {
                 setData(resp.data)
             })

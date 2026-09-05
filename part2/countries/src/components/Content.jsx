@@ -1,5 +1,4 @@
 const Content = ({content, oneResult}) => {
-    console.log(oneResult ? content[0].languages : '')
     return oneResult 
         ? (
             <div>
