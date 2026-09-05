@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import noteService from './services/notes'
-import Notification from './components/Notification'
+import {ErrorNotification, SuccessNotification} from './components/Notification'
 
 const Filter = ({ personsToShow, handleFilterChange }) => {
   return (
@@ -24,14 +24,24 @@ const PersonForm = ({ handleFormSubmit, newName, handleNameChange, newNum, handl
   </form>)
 }
 
-const Persons = ({ persons, personsToShow, setPersons }) => {
-  let matchedPersons = persons.filter(person =>
+const Persons = ({ persons, personsToShow, setPersons, setSuccessMessage, setErrorMessage }) => {
+  const matchedPersons = persons.filter(person =>
     person.name.toLowerCase().includes(personsToShow.toLowerCase())
   )
   const handleDelete = (name, id) => {
     if (window.confirm(`Delete ${name}?`)) {
       noteService.deletePerson(id)
-      setPersons(matchedPersons.filter(person => person.id !== id))
+      .then(() => {
+        setPersons(persons.filter(p => p.id !== id))
+        setSuccessMessage(`Deleted ${name}`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
+      })
+      .catch(error => {
+        setSuccessMessage(null)
+        setErrorMessage(`Information of ${name} has already been removed from server`)
+      })
     }
   }
   return matchedPersons.map(person =>
@@ -53,6 +63,7 @@ const App = () => {
   const [newNum, setNewNum] = useState('')
   const [personsToShow, setPersonsToShow] = useState('')
   const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -105,14 +116,15 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successMessage} />
+      <SuccessNotification message={successMessage}/>
+      <ErrorNotification message={errorMessage}/>
       <Filter personsToShow={personsToShow} handleFilterChange={handleFilterChange} />
 
       <h3>Add a new</h3>
       <PersonForm handleFormSubmit={handleFormSubmit} newName={newName} handleNameChange={handleNameChange} newNum={newNum} handleNumChange={handleNumChange} />
 
       <h3>Numbers</h3>
-      <Persons persons={persons} personsToShow={personsToShow} setPersons={setPersons} />
+      <Persons persons={persons} personsToShow={personsToShow} setPersons={setPersons} setSuccessMessage={setSuccessMessage} setErrorMessage={setErrorMessage}/>
 
     </div>
   )
