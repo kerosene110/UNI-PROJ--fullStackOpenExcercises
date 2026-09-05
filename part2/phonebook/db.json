@@ -19,11 +19,6 @@
       "name": "Mary Poppendieck",
       "number": "39-23-6423122",
       "id": "4"
-    },
-    {
-      "name": "aa bb",
-      "number": "123",
-      "id": "gF0L6NKAwDs"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
