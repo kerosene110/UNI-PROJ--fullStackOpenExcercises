@@ -2,8 +2,11 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 
+morgan.token('post_data', function (req, _) { return JSON.stringify(req.body) })
+
 app.use(express.json())
-  app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post_data'))
+app.use(express.static('dist'))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post_data'))
 
 let persons = [
   {
@@ -28,9 +31,10 @@ let persons = [
   }
 ]
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
-})
+// Now it returns whats in ./dist
+// app.get('/', (request, response) => {
+  // response.send('<h1>Hello World!</h1>')
+// })
 
 app.get('/api/persons', (request, response) => {
   response.json(persons)
@@ -66,7 +70,6 @@ const generateId = () => {
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
-  morgan.token('post_data', function (req, _) { return JSON.stringify(req.body) })
 
   if (!body.name || !body.number) {
     return response.status(400).json({
@@ -86,7 +89,7 @@ app.post('/api/persons', (request, response) => {
   }
 
   persons = persons.concat(entry)
-  response.json(persons)
+  response.json(entry)
 })
 
 const PORT = 3001
