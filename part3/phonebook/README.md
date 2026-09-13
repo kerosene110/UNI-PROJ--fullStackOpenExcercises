@@ -2,7 +2,7 @@
 
 This is my solution to Full Stack Open 2026 part3, Exercises 3.9-3.11. The delivery is a static web app deployed to the internet.
 
-The deployed app: 
+The deployed app: https://p3-phonebook-phonebook.2.rahtiapp.fi/ 
 
 ## Dev guide
 
