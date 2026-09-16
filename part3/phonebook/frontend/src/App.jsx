@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import noteService from './services/notes'
-import {ErrorNotification, SuccessNotification} from './components/Notification'
+import { ErrorNotification, SuccessNotification } from './components/Notification'
 
 const Filter = ({ personsToShow, handleFilterChange }) => {
   return (
@@ -31,17 +31,17 @@ const Persons = ({ persons, personsToShow, setPersons, setSuccessMessage, setErr
   const handleDelete = (name, id) => {
     if (window.confirm(`Delete ${name}?`)) {
       noteService.deletePerson(id)
-      .then(() => {
-        setPersons(persons.filter(p => p.id !== id))
-        setSuccessMessage(`Deleted ${name}`)
-        setTimeout(() => {
+        .then(() => {
+          setPersons(persons.filter(p => p.id !== id))
+          setSuccessMessage(`Deleted ${name}`)
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
+        })
+        .catch(() => {
           setSuccessMessage(null)
-        }, 5000)
-      })
-      .catch(() => {
-        setSuccessMessage(null)
-        setErrorMessage(`Information of ${name} has already been removed from server`)
-      })
+          setErrorMessage(`Information of ${name} has already been removed from server`)
+        })
     }
   }
   return matchedPersons.map(person =>
@@ -100,14 +100,20 @@ const App = () => {
       id: persons.length + 1
     }
 
-    noteService.create(personObject).then(returnedObj => {
-      setPersons(persons.concat(returnedObj))
-    }).then(() => {
-      setSuccessMessage(`Added ${newName}`)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
-    })
+    noteService.create(personObject)
+      .then(returnedObj => {
+        setPersons(persons.concat(returnedObj))
+      }).then(() => {
+        setSuccessMessage(`Added ${newName}`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
+      }).catch(error => {
+        setErrorMessage(error.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      })
 
     setNewName('')
     setNewNum('')
@@ -116,15 +122,15 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <SuccessNotification message={successMessage}/>
-      <ErrorNotification message={errorMessage}/>
+      <SuccessNotification message={successMessage} />
+      <ErrorNotification message={errorMessage} />
       <Filter personsToShow={personsToShow} handleFilterChange={handleFilterChange} />
 
       <h3>Add a new</h3>
       <PersonForm handleFormSubmit={handleFormSubmit} newName={newName} handleNameChange={handleNameChange} newNum={newNum} handleNumChange={handleNumChange} />
 
       <h3>Numbers</h3>
-      <Persons persons={persons} personsToShow={personsToShow} setPersons={setPersons} setSuccessMessage={setSuccessMessage} setErrorMessage={setErrorMessage}/>
+      <Persons persons={persons} personsToShow={personsToShow} setPersons={setPersons} setSuccessMessage={setSuccessMessage} setErrorMessage={setErrorMessage} />
 
     </div>
   )
