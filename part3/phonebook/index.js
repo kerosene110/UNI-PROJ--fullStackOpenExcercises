@@ -3,7 +3,7 @@ const morgan = require('morgan')
 const app = express()
 const Person = require('./models/person')
 
-morgan.token('post_data', function (req, _) { return JSON.stringify(req.body) })
+morgan.token('post_data', function (req) { return JSON.stringify(req.body) })
 
 app.use(express.json())
 app.use(express.static('dist'))
@@ -29,7 +29,7 @@ app.get('/api/persons', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.get('/info', (request, response, next) => {
+app.get('/info', (_request, response, next) => {
   Person.find({})
     .then(results => {
       response.send(
@@ -73,14 +73,14 @@ app.post('/api/persons', (request, response, next) => {
         return response.status(409).json({ error: 'name must be unique' })
       }
 
-    const entry = new Person({
-      name: body.name,
-      number: body.number
+      const entry = new Person({
+        name: body.name,
+        number: body.number
+      })
+      return entry.save().then(savedPerson => {
+        response.json(savedPerson)
+      })
     })
-    return entry.save().then(savedPerson => {
-      response.json(savedPerson)
-    })
-  })
     .catch(error => next(error))
 })
 
