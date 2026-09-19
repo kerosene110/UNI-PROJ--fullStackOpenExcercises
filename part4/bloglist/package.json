@@ -1,0 +1,16 @@
+{
+  "name": "bloglist",
+  "version": "0.0.1",
+  "description": "Save interesting blogs you stumble across the internet",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.10.1"
+  }
+}
