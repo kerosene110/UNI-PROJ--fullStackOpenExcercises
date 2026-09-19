@@ -1,13 +1,20 @@
 const express = require('express')
-require('dotenv').config({path: './atlas-credentials.env', override: true })
 const mongoose = require('mongoose')
+const config = require('./utils/config')
+const Blog = require('./models/blog')
+// const blogsRouter = require('./controllers/blogs')
 
 const app = express()
-const Blog = require('./models/blog')
 
-const mongoUrl = process.env.MONGODB_URL
-// console.log(`connecting to ${mongoUrl}`)
-mongoose.connect(mongoUrl, { family: 4 })
+mongoose.connect(config.MONGODB_URL, { family: 4 })
+// mongoose
+//   .connect(config.MONGODB_URL)
+//   .then(() => {
+//     console.info('connected to MongoDB')
+//   })
+//   .catch((error) => {
+//     console.error('error connection to MongoDB:', error.message)
+//   })
 
 app.use(express.json())
 
