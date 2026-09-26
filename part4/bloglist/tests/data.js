@@ -46,6 +46,13 @@ const blogs = [
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
     __v: 0
+  },
+  {
+    _id: "6ab7f8ef45eca7852aa2fafa",
+    title: 'IQ is largely a pseudoscientific swindle (Argument Closed)',
+    author: 'Nassim Nicholas Taleb',
+    url: 'https://medium.com/incerto/iq-is-largely-a-pseudoscientific-swindle-f131c101ba39',
+    likes: 2000
   }
 ]
 
