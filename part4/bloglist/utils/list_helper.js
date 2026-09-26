@@ -30,6 +30,23 @@ const mostBlogs = (blogs) => {
     return { author: result, blogs: counter[result] }
 }
 
+const mostLikes = (blogs) => {
+    if (!blogs || blogs.length === 0) {
+        return null
+    }
+
+    let _ = require('lodash')
+    const result = _.chain(blogs).groupBy('author')
+        .map((authorBlogs, author) => ({
+            author: author,
+            likes: _.sumBy(authorBlogs, 'likes')
+        }))
+        .maxBy('likes')
+        .value()
+
+    return result
+}
+
 module.exports = {
-    dummy, totalLikes, favoriteBlog, mostBlogs
+    dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes
 }
