@@ -3,7 +3,7 @@ const { test, after, beforeEach } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
-const helper = require('./data')
+const helper = require('./test_helper')
 const Blog = require('../models/blog')
 
 const api = supertest(app)
@@ -13,7 +13,6 @@ beforeEach(async () => {
   await Blog.insertMany(helper.blogs)
 })
 
-// Ex 4.8
 test('blogs are returned as json', async () => {
   await api
     .get('/api/blogs')
@@ -31,6 +30,26 @@ test('the unique identifier property of the blog posts is named id rather than _
   resp.body.forEach((blog) => {
     assert.ok(blog.id)
   })
+})
+
+test('POST /api/blogs URL successfully creates a new blog post', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const newBlog = {
+    title: 'aa',
+    author: 'bb',
+    url: 'https://example.com',
+    likes: 2000
+  }
+  await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+  
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, blogsAtStart.length + 1)
+
+  const titles = blogsAtEnd.map((blog) => blog.title)
+  assert.ok(titles.includes(newBlog.title))
 })
 
 after(async () => {
