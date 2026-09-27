@@ -66,8 +66,20 @@ test('if the likes property is missing, it will default to the value 0.', async 
 })
 
 test('if the title or url properties are missing, the backend responds 400 Bad Request', async () => {
-  const newBlog = {author: 'ok'}
+  const newBlog = { author: 'ok' }
   await api.post('/api/blogs').send(newBlog).expect(400)
+})
+
+test('Delete an existing blog post returns 204', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+
+  const someBlog = blogsAtStart[0]
+  await api.delete(`/api/blogs/${someBlog.id}`).expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtStart.length, blogsAtEnd.length + 1)
+  const ids = blogsAtEnd.map((item) => item.id)
+  assert(!ids.includes(someBlog.id))
 })
 
 after(async () => {
