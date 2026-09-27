@@ -82,6 +82,19 @@ test('Delete an existing blog post returns 204', async () => {
   assert(!ids.includes(someBlog.id))
 })
 
+test('Update an existing blog post returns 200', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const someBlog = blogsAtStart[0]
+  const updatedBlog = { likes: 100 }
+
+  const resp = await api.put(`/api/blogs/${someBlog.id}`)
+    .send(updatedBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(resp.body.likes, updatedBlog.likes)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
