@@ -44,12 +44,25 @@ test('POST /api/blogs URL successfully creates a new blog post', async () => {
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
-  
+
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtEnd.length, blogsAtStart.length + 1)
 
   const titles = blogsAtEnd.map((blog) => blog.title)
   assert.ok(titles.includes(newBlog.title))
+})
+
+test('if the likes property is missing from the request, it will default to the value 0.', async () => {
+  const newBlog = {
+    title: 'cc',
+    author: 'dd',
+    url: 'https://example.com',
+  }
+  const resp = await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+  assert.strictEqual(resp.body.likes, 0)
 })
 
 after(async () => {
