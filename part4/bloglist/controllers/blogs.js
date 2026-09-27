@@ -12,6 +12,8 @@ blogsRouter.post('/', (request, response) => {
 
   blog.save().then((result) => {
     response.status(201).json(result)
+  }).catch(err => {
+    response.status(400).end()
   })
 })
 

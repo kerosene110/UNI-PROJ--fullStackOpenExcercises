@@ -52,7 +52,7 @@ test('POST /api/blogs URL successfully creates a new blog post', async () => {
   assert.ok(titles.includes(newBlog.title))
 })
 
-test('if the likes property is missing from the request, it will default to the value 0.', async () => {
+test('if the likes property is missing, it will default to the value 0.', async () => {
   const newBlog = {
     title: 'cc',
     author: 'dd',
@@ -63,6 +63,11 @@ test('if the likes property is missing from the request, it will default to the 
     .expect(201)
     .expect('Content-Type', /application\/json/)
   assert.strictEqual(resp.body.likes, 0)
+})
+
+test('if the title or url properties are missing, the backend responds 400 Bad Request', async () => {
+  const newBlog = {author: 'ok'}
+  await api.post('/api/blogs').send(newBlog).expect(400)
 })
 
 after(async () => {
