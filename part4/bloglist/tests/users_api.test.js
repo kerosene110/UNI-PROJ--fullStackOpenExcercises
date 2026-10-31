@@ -62,6 +62,31 @@ describe('when there is initially one user at db', () => {
 
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
+
+  test('Username must be given', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      name: 'Superuser',
+      password: 'salainen'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('expected non-empty `username`'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('Username must be at least 3 chars loing', async () => {})
+  test('Password must be given', async () => {})
+  test('Password must be at least 3 chars loing', async () => {})
+
 })
 
 after(async () => {

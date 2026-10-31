@@ -39,7 +39,7 @@ describe('total likes', () => {
   })
 })
 
-const { blogs } = require('./data')
+const { blogs } = require('./test_helper')
 
 describe('Favorite blog', () => {
   test('of empty list returns null', () => {
@@ -49,7 +49,7 @@ describe('Favorite blog', () => {
 
   test('of a bigger list is calculated right', () => {
     const result = listHelper.favoriteBlog(blogs)
-    assert.strictEqual(result, blogs[2])
+    assert.strictEqual(result, blogs[6])
   })
 })
 
@@ -81,10 +81,7 @@ describe('Author with the most likes', () => {
   test('of a bigger list is calculated right', () => {
     const result = listHelper.mostLikes(blogs)
     assert.deepStrictEqual(result,
-      {
-        author: "Edsger W. Dijkstra",
-        likes: 17
-      }
+      { author: 'Nassim Nicholas Taleb', likes: 2000 }
     )
   })
 })
