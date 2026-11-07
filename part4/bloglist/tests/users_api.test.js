@@ -15,7 +15,7 @@ describe('when there is initially one user at db', () => {
         await User.deleteMany({})
 
         const passwordHash = await bcrypt.hash('sekret', 10)
-        const user = new User({ username: 'root', passwordHash })
+        const user = new User({ username: 'root', name: 'nimi' ,passwordHash })
 
         await user.save()
     })
@@ -141,6 +141,14 @@ describe('when there is initially one user at db', () => {
         assert(result.body.error.includes('`password` should be at least 3 chars long'))
 
         assert.strictEqual(usersAtEnd.length, usersAtStart.length)})
+})
+
+describe('Exercise 4.17 Blog list expansion', () => {
+
+    test('listing all users also displays the blogs created by each user', async() => {
+        const result = await api.get('/api/users')
+
+    })
 })
 
 after(async () => {

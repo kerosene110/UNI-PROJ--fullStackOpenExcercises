@@ -1,15 +1,29 @@
 const assert = require('node:assert')
-const { test, after, beforeEach } = require('node:test')
+const bcrypt = require('bcrypt')
+const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  const test_case_user = new User({
+    username: `test_case_user`,
+    name: 'Test Case User',
+    passwordHash: await bcrypt.hash('test_case_pw', 10)
+  })
+  const savedUser = await test_case_user.save()
+  helper.blogs.forEach((blog) => {
+    blog.user = savedUser._id
+  })
   await Blog.insertMany(helper.blogs)
 })
 
@@ -34,11 +48,13 @@ test('the unique identifier property of the blog posts is named id rather than _
 
 test('POST /api/blogs URL successfully creates a new blog post', async () => {
   const blogsAtStart = await helper.blogsInDb()
+  const usersAtStart = await helper.usersInDb()
   const newBlog = {
     title: 'aa',
     author: 'bb',
     url: 'https://example.com',
-    likes: 2000
+    likes: 2000,
+    userId: usersAtStart[0].id
   }
   await api.post('/api/blogs')
     .send(newBlog)
@@ -52,11 +68,43 @@ test('POST /api/blogs URL successfully creates a new blog post', async () => {
   assert.ok(titles.includes(newBlog.title))
 })
 
+// Exercise 4.17: Expand blog list
+test('when a new blog is created, a user from the database is designated as its creator', async () => {
+  const usersInDB = await helper.usersInDb()
+  const firstUserInDB = usersInDB[0]
+
+  const newBlog = {
+    title: 'aa',
+    author: 'bb',
+    url: 'https://example.com',
+    likes: 2000,
+    userId: firstUserInDB.id
+  }
+  const resp = await api.post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(firstUserInDB.id, resp.body.user)
+})
+
+test("when listing all blogs, the creator's user information is displayed with the blog", async () => {
+  const response = await api.get('/api/blogs')
+
+  response.body.forEach((blog) => {
+    assert.ok(blog.user)
+  })
+})
+
 test('if the likes property is missing, it will default to the value 0.', async () => {
+  const usersInDB = await helper.usersInDb()
+  const firstUserInDB = usersInDB[0]
+
   const newBlog = {
     title: 'cc',
     author: 'dd',
     url: 'https://example.com',
+    userId: firstUserInDB.id
   }
   const resp = await api.post('/api/blogs')
     .send(newBlog)
