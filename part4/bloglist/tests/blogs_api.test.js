@@ -23,11 +23,35 @@ const bearerToken = async () => {
 
   return response.body.token
 }
+const blogFromUser2 = async () => {
+  // User 2 with a blog
+  const user2Creds = {
+    username: 'someone_else',
+    password: 'something_else'
+  }
+  const user2 = new User({
+    username: user2Creds.username,
+    name: 'Some Other User',
+    passwordHash: await bcrypt.hash(user2Creds.password, 10)
+  })
+  const savedUser2 = await user2.save()
+  const user2Blog = new Blog({
+    title: 'aa',
+    author: 'bb',
+    url: 'example.com',
+    likes: 123,
+    user: savedUser2._id
+  })
+  const savedUser2Blog = await Blog.insertOne(user2Blog)
+
+  return savedUser2Blog
+}
 
 beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
 
+  // User 1 with 1st batch of blogs
   const testCaseUser = new User({
     username: userCreds.username,
     name: 'Test Case User',
@@ -38,6 +62,7 @@ beforeEach(async () => {
     blog.user = savedUser._id
   })
   await Blog.insertMany(helper.blogs)
+
 })
 
 test('blogs are returned as json', async () => {
@@ -138,15 +163,43 @@ test('if the title or url properties are missing, the backend responds 400 Bad R
 
 test('Delete an existing blog post returns 204', async () => {
   const blogsAtStart = await helper.blogsInDb()
+  const token = await bearerToken()
+  const decodedToken = jwt.verify(token, process.env.PART4_SECRET)
 
   const someBlog = blogsAtStart[0]
-  await api.delete(`/api/blogs/${someBlog.id}`).expect(204)
+  await api
+    .delete(`/api/blogs/${someBlog.id}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(204)
+
+  assert.strictEqual(decodedToken.id, someBlog.user.toString())
 
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtStart.length, blogsAtEnd.length + 1)
+
   const ids = blogsAtEnd.map((item) => item.id)
   assert(!ids.includes(someBlog.id))
 })
+
+test('Delete an existing blog post from a different user returns 401', async () => {
+  const someBlog = await blogFromUser2()
+  const blogsAtStart = await helper.blogsInDb()
+  const token = await bearerToken()
+  const decodedToken = jwt.verify(token, process.env.PART4_SECRET)
+
+  assert(decodedToken.id !== someBlog.user.toString())
+  await api
+    .delete(`/api/blogs/${someBlog.id}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(401)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtStart.length, blogsAtEnd.length)
+
+  const ids = blogsAtEnd.map((item) => item.id)
+  assert(ids.includes(someBlog.id))
+})
+
 
 test('Update an existing blog post returns 200', async () => {
   const blogsAtStart = await helper.blogsInDb()

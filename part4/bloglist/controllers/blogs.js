@@ -15,6 +15,7 @@ blogsRouter.post('/', async (request, response) => {
   }
 
   const user = await User.findById(decodedToken.id)
+  // const user = request.user
   if (!user) {
     return response.status(400).json({ error: 'userId missing or not valid' })
   }
@@ -32,7 +33,15 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
+  const decodedToken = jwt.verify(request.token, process.env.PART4_SECRET)
+  const reqUserId = decodedToken.id
+  const blog = await Blog.findById(request.params.id)
+  if (blog.user.toString() !== reqUserId.toString()) {
+    return response.status(401).json({ error: 'Unauthorized deletion' })
+  } 
+  
+  // await Blog.findByIdAndDelete(request.params.id)
+  await blog.deleteOne()
   response.status(204).end()
 })
 
