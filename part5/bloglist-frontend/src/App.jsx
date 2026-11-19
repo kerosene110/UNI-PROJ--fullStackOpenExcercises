@@ -27,7 +27,7 @@ const App = () => {
     try {
       const user = await loginService.login({ username, password })
 
-      window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
+      window.localStorage.setItem('loggedUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -39,6 +39,10 @@ const App = () => {
         setErrorMessage(null)
       }, 5000)
     }
+  }
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedUser')
+    setUser(null)
   }
 
   const blogsToShow = showAll ? blogs : [{ title: 'aa', author: 'bb' }]
@@ -69,6 +73,7 @@ const App = () => {
     </form>
   )
 
+
   return (
     <div>
 
@@ -83,6 +88,7 @@ const App = () => {
         <div>
           <h2>blogs</h2>
           <p>{user.name} logged in</p>
+          <button onClick={handleLogout}>logout</button>
 
           <ul>
             {blogsToShow.map(blog => (
