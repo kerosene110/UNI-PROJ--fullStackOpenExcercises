@@ -44,6 +44,24 @@ const App = () => {
     window.localStorage.removeItem('loggedUser')
     setUser(null)
   }
+  const handleBlogCreate = async event => {
+    event.preventDefault()
+    const title = event.target.title.value
+    const author = event.target.author.value
+    const url = event.target.url.value
+
+    try {
+      const newBlog = await blogService.create({ title, author, url })
+      setBlogs(blogs.concat(newBlog))
+      event.target.reset()
+    } catch (error) {
+      console.error(error)
+      setErrorMessage('failed to create blog')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
 
   const blogsToShow = showAll ? blogs : [{ title: 'aa', author: 'bb' }]
 
@@ -73,6 +91,15 @@ const App = () => {
     </form>
   )
 
+  const blogInputForm = () => (
+    <form onSubmit={handleBlogCreate}>
+      <div><label>title:<input name="title" /></label></div>
+      <div><label>author:<input name="author" /></label></div>
+      <div><label>url:<input name="url" /></label></div>
+      <button type="submit">create</button>
+    </form>
+  )
+
 
   return (
     <div>
@@ -87,8 +114,10 @@ const App = () => {
       {user && (
         <div>
           <h2>blogs</h2>
-          <p>{user.name} logged in</p>
-          <button onClick={handleLogout}>logout</button>
+          <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+
+          <h2>create new</h2>
+          {blogInputForm()}
 
           <ul>
             {blogsToShow.map(blog => (
