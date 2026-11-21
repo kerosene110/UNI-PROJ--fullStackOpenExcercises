@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Togglable from './components/Togglable'
 import { SuccessNotification, ErrorNotification } from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -97,12 +98,14 @@ const App = () => {
   )
 
   const blogInputForm = () => (
-    <form onSubmit={handleBlogCreate}>
-      <div><label>title:<input name="title" /></label></div>
-      <div><label>author:<input name="author" /></label></div>
-      <div><label>url:<input name="url" /></label></div>
-      <button type="submit">create</button>
-    </form>
+    <Togglable buttonLabel="create new blog">
+      <form onSubmit={handleBlogCreate}>
+        <div><label>title:<input name="title" /></label></div>
+        <div><label>author:<input name="author" /></label></div>
+        <div><label>url:<input name="url" /></label></div>
+        <button type="submit">create</button>
+      </form>
+    </Togglable>
   )
 
 
