@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import { SuccessNotification, ErrorNotification } from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -15,6 +16,7 @@ const App = () => {
   const [password, setPassword] = useState('test_case_pw')
   const [user, setUser] = useState(null)
 
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(initialBlogs =>
@@ -46,28 +48,6 @@ const App = () => {
     window.localStorage.removeItem('loggedUser')
     setUser(null)
   }
-  const handleBlogCreate = async event => {
-    event.preventDefault()
-    const title = event.target.title.value
-    const author = event.target.author.value
-    const url = event.target.url.value
-
-    try {
-      const newBlog = await blogService.create({ title, author, url })
-      setBlogs(blogs.concat(newBlog))
-      setSuccessMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
-      event.target.reset()
-    } catch (error) {
-      console.error(error)
-      setErrorMessage('failed to create blog')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
-  }
 
   const blogsToShow = showAll ? blogs : [{ title: 'aa', author: 'bb' }]
 
@@ -97,18 +77,6 @@ const App = () => {
     </form>
   )
 
-  const blogInputForm = () => (
-    <Togglable buttonLabel="create new blog">
-      <form onSubmit={handleBlogCreate}>
-        <div><label>title:<input name="title" /></label></div>
-        <div><label>author:<input name="author" /></label></div>
-        <div><label>url:<input name="url" /></label></div>
-        <button type="submit">create</button>
-      </form>
-    </Togglable>
-  )
-
-
   return (
     <div>
 
@@ -126,7 +94,15 @@ const App = () => {
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
 
           <h2>create new</h2>
-          {blogInputForm()}
+          <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+            <BlogForm
+              blogs={blogs}
+              setBlogs={setBlogs}
+              setSuccessMessage={setSuccessMessage}
+              setErrorMessage={setErrorMessage}
+              blogFormRef={blogFormRef}
+            />
+          </Togglable>
 
           <ul>
             {blogsToShow.map(blog => (
