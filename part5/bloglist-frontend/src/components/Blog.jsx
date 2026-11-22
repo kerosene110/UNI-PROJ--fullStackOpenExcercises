@@ -1,6 +1,32 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const LikeLine = ({ blog, blogService, setErrorMessage }) => {
+  const [likes, setLikes] = useState(blog.likes)
+
+  try {
+    const handleLike = async () => {
+      await blogService.update(blog.id, {
+        ...blog,
+        likes: blog.likes + 1
+      })
+      setLikes(likes + 1)
+    }
+
+    return (
+      <p>
+        {likes}
+        <button onClick={handleLike}>like</button>
+      </p>
+    )
+  } catch (error) {
+    setErrorMessage('Failed to like blog: ' + error)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
+  }
+}
+
+const Blog = ({ blog, blogService }) => {
   const [visible, setVisible] = useState(false)
 
   const blogStyle = {
@@ -22,7 +48,7 @@ const Blog = ({ blog }) => {
       {visible && (
         <div>
           <p>{blog.url}</p>
-          <p>{blog.likes} <button>like</button></p>
+          <LikeLine blog={blog} blogService={blogService}></LikeLine>
           <p>{blog.user === null ? 'null' : blog.user.name}</p>
         </div>
       )}

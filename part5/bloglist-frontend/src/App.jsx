@@ -109,6 +109,8 @@ const App = () => {
               <Blog
                 key={blog.id}
                 blog={blog}
+                blogService={blogService}
+                setErrorMessage={setErrorMessage}
               />
             ))}
           </ul>
