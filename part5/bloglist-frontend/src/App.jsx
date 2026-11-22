@@ -9,7 +9,6 @@ import loginService from './services/login'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   // const [newBlog, setNewBlog] = useState('')
-  const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
   const [username, setUsername] = useState('test_case_user')
