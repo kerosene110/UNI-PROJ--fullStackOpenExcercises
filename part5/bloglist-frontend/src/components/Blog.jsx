@@ -14,7 +14,7 @@ const LikeLine = ({ blog, blogService, setErrorMessage }) => {
 
     return (
       <p>
-        {likes}
+        likes {likes}
         <button onClick={handleLike}>like</button>
       </p>
     )
