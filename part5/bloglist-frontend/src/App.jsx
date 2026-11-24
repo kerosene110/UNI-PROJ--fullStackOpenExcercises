@@ -24,6 +24,25 @@ const App = () => {
     )
   }, [])
 
+  const handleLike = async blog => {
+    try {
+      const updatedBlog = await blogService.update(blog.id, {
+        ...blog,
+        likes: blog.likes + 1
+      })
+      setBlogs(currentBlogs =>
+        currentBlogs.map(currentBlog =>
+          currentBlog.id === updatedBlog.id ? updatedBlog : currentBlog
+        )
+      )
+    } catch (error) {
+      console.error(error)
+      setErrorMessage('Failed to like blog: ' + error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
 
   const handleLogin = async event => {
     event.preventDefault()
@@ -108,6 +127,7 @@ const App = () => {
                 key={blog.id}
                 blog={blog}
                 blogService={blogService}
+                handleLike={handleLike}
                 setErrorMessage={setErrorMessage}
                 ref={blogRef}
               />

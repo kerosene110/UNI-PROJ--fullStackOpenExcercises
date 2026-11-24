@@ -1,29 +1,12 @@
 import { useState } from 'react'
 
-const LikeLine = ({ blog, blogService, setErrorMessage }) => {
-  const [likes, setLikes] = useState(blog.likes)
-
-  try {
-    const handleLike = async () => {
-      await blogService.update(blog.id, {
-        ...blog,
-        likes: blog.likes + 1
-      })
-      setLikes(likes + 1)
-    }
-
-    return (
-      <p>
-        likes {likes}
-        <button onClick={handleLike}>like</button>
-      </p>
-    )
-  } catch (error) {
-    setErrorMessage('Failed to like blog: ' + error)
-    setTimeout(() => {
-      setErrorMessage(null)
-    }, 5000)
-  }
+const LikeLine = ({ blog, handleLike }) => {
+  return (
+    <p>
+      likes {blog.likes}
+      <button onClick={() => handleLike(blog)}>like</button>
+    </p>
+  )
 }
 
 const DeleteButton = ({ blog, blogService, setErrorMessage, ref }) => {
@@ -53,7 +36,7 @@ const DeleteButton = ({ blog, blogService, setErrorMessage, ref }) => {
   }
 }
 
-const Blog = ({ blog, blogService, setErrorMessage, ref }) => {
+const Blog = ({ blog, blogService, setErrorMessage, handleLike, ref }) => {
   const [visible, setVisible] = useState(false)
 
   const blogStyle = {
@@ -77,7 +60,7 @@ const Blog = ({ blog, blogService, setErrorMessage, ref }) => {
       {visible && (
         <div>
           <p>{blog.url}</p>
-          <LikeLine blog={blog} blogService={blogService} setErrorMessage={setErrorMessage}></LikeLine>
+          <LikeLine blog={blog} handleLike={handleLike}></LikeLine>
           <p>{blog.user === null ? 'null' : blog.user.name}</p>
           <DeleteButton blog={blog} blogService={blogService} setErrorMessage={setErrorMessage} ref={ref}></DeleteButton>
         </div>
