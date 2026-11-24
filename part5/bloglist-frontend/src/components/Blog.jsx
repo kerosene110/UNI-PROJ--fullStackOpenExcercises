@@ -63,8 +63,9 @@ const Blog = ({ blog, blogService, setErrorMessage, ref }) => {
     display: ''
   }
 
+  // Add css classes to help with testing
   return (
-    <div style={blogStyle} ref={ref}>
+    <div style={blogStyle} ref={ref} className='blog'>
       <div>
         {blog.title} {blog.author}{' '}
         <button onClick={() => setVisible(!visible)}>
