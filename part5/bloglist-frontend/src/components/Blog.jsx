@@ -27,7 +27,9 @@ const LikeLine = ({ blog, blogService, setErrorMessage }) => {
 }
 
 const DeleteButton = ({ blog, blogService, setErrorMessage, ref }) => {
-  if (blog.user === null || blog.username !== window.localStorage.getItem('loggedUser').username) {
+  if (blog.user === null ||
+    window.localStorage.getItem('loggedUser') === null ||
+    blog.username !== window.localStorage.getItem('loggedUser').username) {
     return null
   }
 
