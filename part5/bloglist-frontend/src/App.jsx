@@ -68,6 +68,27 @@ const App = () => {
     setUser(null)
   }
 
+  const createBlog = async blogObject => {
+    blogFormRef.current.toggleVisibility()
+
+    try {
+      const newBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(newBlog))
+      setSuccessMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
+      return true
+    } catch (error) {
+      console.error(error)
+      setErrorMessage('failed to create blog')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+      return false
+    }
+  }
+
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <div>
@@ -113,11 +134,7 @@ const App = () => {
           <h2>create new</h2>
           <Togglable buttonLabel="create new blog" hideLabel="cancel" ref={blogFormRef}>
             <BlogForm
-              blogs={blogs}
-              setBlogs={setBlogs}
-              setSuccessMessage={setSuccessMessage}
-              setErrorMessage={setErrorMessage}
-              blogFormRef={blogFormRef}
+              createBlog={createBlog}
             />
           </Togglable>
 
