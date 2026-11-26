@@ -16,8 +16,6 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
-  const blogRef = useRef()
-
   useEffect(() => {
     blogService.getAll().then(initialBlogs =>
       setBlogs(initialBlogs)
@@ -38,6 +36,28 @@ const App = () => {
     } catch (error) {
       console.error(error)
       setErrorMessage('Failed to like blog: ' + error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const handleDelete = async blog => {
+    const confirmed = window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      const response = await blogService.del(blog.id)
+      if (response.status === 204) {
+        setBlogs(currentBlogs =>
+          currentBlogs.filter(currentBlog => currentBlog.id !== blog.id)
+        )
+      }
+    } catch (error) {
+      console.error(error)
+      setErrorMessage('Failed to delete blog: ' + error)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -143,10 +163,8 @@ const App = () => {
               <Blog
                 key={blog.id}
                 blog={blog}
-                blogService={blogService}
                 handleLike={handleLike}
-                setErrorMessage={setErrorMessage}
-                ref={blogRef}
+                handleDelete={handleDelete}
               />
             ))}
           </ul>

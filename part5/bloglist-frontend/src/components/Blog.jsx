@@ -9,34 +9,17 @@ const LikeLine = ({ blog, handleLike }) => {
   )
 }
 
-const DeleteButton = ({ blog, blogService, setErrorMessage, ref }) => {
+const DeleteButton = ({ blog, handleDelete }) => {
   if (blog.user === null ||
     window.localStorage.getItem('loggedUser') === null ||
     blog.username !== window.localStorage.getItem('loggedUser').username) {
     return null
   }
 
-  const handleDelete = async () => {
-    const confirmed = window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
-    if (confirmed) {
-      const resp = await blogService.del(blog.id)
-      if (resp.status === 204) {
-        ref.current.style.display = 'none'
-      }
-    }
-  }
-
-  try {
-    return (<button onClick={handleDelete}>remove</button>)
-  } catch (error) {
-    setErrorMessage('Failed to delete blog: ' + error)
-    setTimeout(() => {
-      setErrorMessage(null)
-    }, 5000)
-  }
+  return (<button onClick={() => handleDelete(blog)}>remove</button>)
 }
 
-const Blog = ({ blog, blogService, setErrorMessage, handleLike, ref }) => {
+const Blog = ({ blog, handleLike, handleDelete }) => {
   const [visible, setVisible] = useState(false)
 
   const blogStyle = {
@@ -50,7 +33,7 @@ const Blog = ({ blog, blogService, setErrorMessage, handleLike, ref }) => {
 
   // Add css classes to help with testing
   return (
-    <div style={blogStyle} ref={ref} className='blog'>
+    <div style={blogStyle} className='blog'>
       <div>
         {blog.title} {blog.author}{' '}
         <button onClick={() => setVisible(!visible)}>
@@ -62,7 +45,7 @@ const Blog = ({ blog, blogService, setErrorMessage, handleLike, ref }) => {
           <p>{blog.url}</p>
           <LikeLine blog={blog} handleLike={handleLike}></LikeLine>
           <p>{blog.user === null ? 'null' : blog.user.name}</p>
-          <DeleteButton blog={blog} blogService={blogService} setErrorMessage={setErrorMessage} ref={ref}></DeleteButton>
+          <DeleteButton blog={blog} handleDelete={handleDelete}></DeleteButton>
         </div>
       )}
     </div>
