@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const LikeLine = ({ blog, handleLike }) => {
   return (
-    <p>
+    <p className='likes'>
       likes {blog.likes}
       <button onClick={() => handleLike(blog)}>like</button>
     </p>

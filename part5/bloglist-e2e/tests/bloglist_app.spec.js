@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith, createBlog } = require('./helper')
+const { loginWith, createBlog, addSetOfBlogs } = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -27,14 +27,14 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      loginWith(page, 'test_case_user', 'test_case_pw')
+      await loginWith(page, 'test_case_user', 'test_case_pw')
 
       await expect(page.getByText('Test Case User logged in')).toBeVisible()
       await expect(page.getByRole('button', { name: 'logout' })).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      loginWith(page, 'mluukkai', 'wrong')
+      await loginWith(page, 'mluukkai', 'wrong')
 
       await expect(page.getByText('wrong credentials')).toBeVisible()
     })
@@ -42,7 +42,7 @@ describe('Blog app', () => {
 
   describe('When logged in', () => {
     beforeEach(async ({ page }) => {
-      loginWith(page, 'test_case_user', 'test_case_pw')
+      await loginWith(page, 'test_case_user', 'test_case_pw')
     })
 
     test('a new blog can be created', async ({ page }) => {
@@ -91,7 +91,7 @@ describe('Blog app', () => {
       await request.post('http://localhost:3003/api/users', {
         data: newUser
       })
-      loginWith(page, 'test_case_user_2', 'test_case_pw_2')
+      await loginWith(page, 'test_case_user_2', 'test_case_pw_2')
 
       const blog = page.locator('.blog').last()
 
@@ -99,6 +99,16 @@ describe('Blog app', () => {
       await expect(blog).toContainText('An author you cant delete')
       await blog.getByRole('button', { name: 'view' }).click()
       await expect(blog.getByRole('button', { name: 'remove' })).toBeHidden()
+    })
+
+    test('blogs are ordered according to likes', async ({ page }) => {
+      await addSetOfBlogs(page)
+
+      const blogs = page.locator('.blog')
+      const likes = await blogs.evaluateAll(blogs => blogs.map(blog => parseInt(blog.querySelector('.likes').textContent.split(' ')[1])))
+      const sortedLikes = [...likes].sort((a, b) => b - a)
+      expect(likes).toEqual(sortedLikes)
+
     })
   })
 })
