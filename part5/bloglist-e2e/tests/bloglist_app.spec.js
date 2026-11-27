@@ -67,6 +67,17 @@ describe('Blog app', () => {
       await page.getByRole('button', { name: 'like' }).last().click()
       await expect(page.getByText('likes 1').last()).toBeVisible()
     })
+
+    test('a blog can be deleted', async ({ page }) => {
+      await createBlog(page, 'A Title to Delete', 'An author to Delete', 'https://www.example.com')
+
+      const blog = page.locator('.blog').last()
+      await blog.getByRole('button', { name: 'view' }).click()
+      page.on('dialog', dialog => dialog.accept())
+      await blog.getByRole('button', { name: 'remove' }).click()
+
+      await expect(blog).toHaveCount(0)
+    })
   })
 })
 
