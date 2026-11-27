@@ -78,6 +78,28 @@ describe('Blog app', () => {
 
       await expect(blog).toHaveCount(0)
     })
+
+    test("only the user who added the blog sees the delete button", async ({ page, request }) => {
+      await createBlog(page, 'A Title you cant delete', 'An author you cant delete', 'https://www.example.com')
+      await page.getByRole('button', { name: 'logout' }).click()
+
+      const newUser = {
+        username: 'test_case_user_2',
+        name: "Test Case User 2",
+        password: 'test_case_pw_2'
+      }
+      await request.post('http://localhost:3003/api/users', {
+        data: newUser
+      })
+      loginWith(page, 'test_case_user_2', 'test_case_pw_2')
+
+      const blog = page.locator('.blog').last()
+
+      await expect(blog).toContainText('A Title you cant delete')
+      await expect(blog).toContainText('An author you cant delete')
+      await blog.getByRole('button', { name: 'view' }).click()
+      await expect(blog.getByRole('button', { name: 'remove' })).toBeHidden()
+    })
   })
 })
 

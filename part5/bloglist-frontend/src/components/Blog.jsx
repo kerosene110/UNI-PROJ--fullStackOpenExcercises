@@ -10,9 +10,11 @@ const LikeLine = ({ blog, handleLike }) => {
 }
 
 const DeleteButton = ({ blog, handleDelete }) => {
+  const loggedUser = JSON.parse(window.localStorage.getItem('loggedUser') || null)
+
   if (blog.user === null ||
-    window.localStorage.getItem('loggedUser') === null ||
-    blog.username !== window.localStorage.getItem('loggedUser').username) {
+    loggedUser === null ||
+    blog.user.username !== loggedUser.username) {
     return null
   }
 
